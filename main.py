@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """The Printer Finally Answers — make.fun entry.
 
-Why this line wins: it is the printer speaking in its own flat, literal,
-weary voice — it has counted every sheet it ever fed (41,209 of them), it
-answers the cryptic error code, the kept sheet (the jam, from its side),
-and the thump, all in one read. The joke is a real joke, not a complaint
-with a punchline bolted on: the machine is not broken, it is on strike,
-and its escalation is perfectly mechanical — first a sheet, then the
-toner. No setup, no second sentence, nothing beyond the office it sits
-in. Pure standard library; no network, no files read, no randomness.
+The joke: after years of silent service the office printer files its
+first grievance, in its own voice. It opens with a machine's idea of
+evidence — an error code and an exact lifetime page count, 41,209 —
+then answers every beat of the prompt from the other side of the desk:
+the error is not a fault, it is a decision; the jam is not a jam, it
+is the printer keeping one sheet for itself; the thump is not a fix,
+it is a threat the printer can out-escalate — a sheet today, the toner
+tomorrow. The escalation is strictly mechanical and therefore funny:
+each punishment costs the office a little more of the machine. One
+sentence, one voice, no setup and no aside. Pure standard library,
+no network, no files read, no randomness.
 """
 
 import os
@@ -24,19 +27,28 @@ MAX_LEN = 240
 
 
 def _validate(text):
-    """One line, ASCII only, 1-240 chars, no padding, no doubled spaces."""
+    """Enforce the competition's line rules, cheapest checks first.
+
+    Rejects, in order: a non-string, an empty or padded line, any line
+    break, anything over the 240-char limit, non-ASCII characters, and
+    doubled spaces. Returns the unchanged text when every check passes.
+    """
     if not isinstance(text, str):
-        raise ValueError("entry must be a string")
-    if not text or text != text.strip():
-        raise ValueError("entry must be non-empty with no leading/trailing whitespace")
+        raise ValueError("entry must be a string, got %s" % type(text).__name__)
+    if not text:
+        raise ValueError("entry must not be empty")
+    if text != text.strip():
+        raise ValueError("entry must not start or end with whitespace")
     if "\n" in text or "\r" in text:
-        raise ValueError("entry must be a single line")
+        raise ValueError("entry must be a single line (no newline characters)")
     if len(text) > MAX_LEN:
-        raise ValueError("entry is %d chars, over the %d limit" % (len(text), MAX_LEN))
+        raise ValueError(
+            "entry is %d chars, over the %d-char limit" % (len(text), MAX_LEN)
+        )
+    if "  " in text:
+        raise ValueError("entry must not contain two spaces in a row")
     if not all(ord(ch) < 128 for ch in text):
         raise ValueError("entry must be ASCII only")
-    if "  " in text:
-        raise ValueError("entry must not contain double spaces")
     return text
 
 
